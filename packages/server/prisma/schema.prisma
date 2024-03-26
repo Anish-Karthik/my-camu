@@ -13,26 +13,40 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model ContactInfo {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  authorId String @unique @db.ObjectId
+
+  userId          String @unique @db.ObjectId
+  userContact     User   @relation("userContact", fields: [userId], references: [id])
+  fatherContact   User   @relation("fatherContact", fields: [userId], references: [id])
+  motherContact   User   @relation(fields: [userId], references: [id], name: "motherContact")
+  guardianContact User   @relation(fields: [userId], references: [id], name: "guardianContact")
+  
+  email           String
+  phone           String
+  address         String
+  city            String
+  state           String
+  country         String
+  zip             String
+}
+
 model User {
   id String @id @default(auto()) @map("_id") @db.ObjectId
 
-  auth_session Session[]
-  key          Key[]
+  username String @unique
+  password String
 
-  userName String   @unique
-  roleId   String   @db.ObjectId
-  role     Role     @relation(fields: [roleId], references: [id])
-  gender   String
-  DOB      DateTime
+  roleId String?   @db.ObjectId
+  role   Role?     @relation(fields: [roleId], references: [id])
+  gender String?
+  DOB    DateTime?
 
-  userContactId       String      @unique @db.ObjectId
-  fatherContactId     String      @unique @db.ObjectId
-  motherContactId     String      @unique @db.ObjectId
-  gardianContactId    String      @unique @db.ObjectId
-  userContactInfo     ContactInfo @relation(fields: [userContactId], references: [id], name: "userContact")
-  fatherContactInfo   ContactInfo @relation(fields: [fatherContactId], references: [id], name: "fatherContact")
-  motherContactInfo   ContactInfo @relation(fields: [motherContactId], references: [id], name: "motherContact")
-  guardianContactInfo ContactInfo @relation(fields: [gardianContactId], references: [id], name: "gardianContact")
+  userContactInfo     ContactInfo? @relation("userContact")
+  fatherContactInfo   ContactInfo? @relation("fatherContact")
+  motherContactInfo   ContactInfo? @relation("motherContact")
+  guardianContactInfo ContactInfo? @relation("guardianContact")
 
   headOfclass       Class? @relation("headOfClass")
   assisstantOfClass Class? @relation("assistantOfClass")
@@ -43,28 +57,24 @@ model User {
   createdDate DateTime     @default(now())
   updatedDate DateTime     @updatedAt
   attendance  Attendance[]
+
+  sessions Session[]
+}
+
+model Content {
+  id        String  @id @default(auto()) @map("_id") @db.ObjectId
+  fieldId   String  @unique @db.ObjectId
+  field     Fields  @relation(fields: [fieldId], references: [id])
+  Value     String
+  requestId String  @unique @db.ObjectId
+  request   Request @relation(fields: [requestId], references: [id])
 }
 
 model Session {
-  id            String @id @default(auto()) @map("_id") @db.ObjectId
-  username      String 
-  activeExpires BigInt
-  idleExpires   BigInt
-
-  userId String @db.ObjectId
-  user   User   @relation(references: [id], fields: [userId], onDelete: Cascade)
-
-  @@index([userId])
-}
-
-model Key {
-  id             String  @id @default(auto()) @map("_id") @db.ObjectId
-  hashedPassword String?
-
-  userId String @db.ObjectId
-  user   User   @relation(references: [id], fields: [userId], onDelete: Cascade)
-
-  @@index([userId])
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  expiresAt DateTime
+  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
 }
 
 enum AttendanceStatus {
@@ -117,15 +127,6 @@ model Fields {
   fieldContent  Content[]
 }
 
-model Content {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  fieldId   String  @unique @db.ObjectId
-  field     Fields  @relation(fields: [fieldId], references: [id])
-  Value     String
-  requestId String  @unique @db.ObjectId
-  request   Request @relation(fields: [requestId], references: [id])
-}
-
 model Form {
   Id           String       @id @default(auto()) @map("_id") @db.ObjectId
   requests     Request[]
@@ -150,22 +151,6 @@ model Attendance {
   attendance AttendanceStatus
   userId     String           @unique @db.ObjectId
   user       User             @relation(fields: [userId], references: [id])
-}
-
-model ContactInfo {
-  id             String @id @default(auto()) @map("_id") @db.ObjectId
-  authorId       String @unique @db.ObjectId
-  userContact    User?  @relation("userContact")
-  fatherContact  User?  @relation("fatherContact")
-  motherContact  User?  @relation("motherContact")
-  gardianContact User?  @relation("gardianContact")
-  email          String
-  phone          String
-  address        String
-  city           String
-  state          String
-  country        String
-  zip            String
 }
 
 model Class {
