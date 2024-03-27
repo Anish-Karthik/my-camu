@@ -9,6 +9,8 @@
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
+    "@elysiajs/eden": "^1.0.7",
+    "@repo/server": "workspace:*",
     "@repo/ui": "workspace:*",
     "next": "^14.0.4",
     "react": "^18.2.0",
