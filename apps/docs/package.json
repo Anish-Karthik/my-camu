@@ -12,6 +12,10 @@
     "@elysiajs/eden": "^1.0.7",
     "@repo/server": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@tanstack/react-query": "^5.28.9",
+    "@trpc/client": "11.0.0-rc.329",
+    "@trpc/react-query": "11.0.0-rc.329",
+    "@trpc/server": "11.0.0-rc.329",
     "next": "^14.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

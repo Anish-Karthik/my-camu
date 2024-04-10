@@ -1,14 +1,17 @@
 "use client";
 import { Button } from "@repo/ui/components/ui/button";
 import type { App } from "@repo/server";
-import { edenFetch, treaty } from "@elysiajs/eden";
+import { treaty } from "@elysiajs/eden";
 import { useEffect, useState } from "react";
+import { trpc } from "../lib/utils/trpc";
+// @ts-ignore
 const api = treaty<App>("localhost:3000", {
   fetch: {
     credentials: "include",
   },
 });
-const fetch = edenFetch<App>("http://localhost:3000");
+
+
 const arr = [
   {
     username: "user1",
@@ -24,13 +27,12 @@ const arr = [
   },
 ];
 
+
 export default function Page() {
+  const greeting = trpc.greeting
   const [csrfToken, setCsrfToken] = useState("");
   useEffect(() => {
-    fetch("/index", {
-      method: "GET",
-      credentials: "include",
-    }).then((response) => console.log(response.data, "response from server"));
+    api.index.get().then(response => response.data);
   }, []);
   console.log(csrfToken);
   return (

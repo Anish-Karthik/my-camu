@@ -3,6 +3,8 @@ import { randomBytes } from "crypto";
 import { Elysia, error, t } from "elysia";
 import { Argon2id } from "oslo/password";
 import { db, lucia } from "./lib/auth.js";
+import { trpc } from "@elysiajs/trpc";
+import { router, createContext } from "./trpc/router/trpc";
 
 const origin = [
   /http:\/\/localhost:*/,
@@ -81,7 +83,7 @@ const authCookie = new Elysia({ name: "authCookie" }).guard((app) =>
     }),
 );
 
-const app = new Elysia()
+const app = new Elysia({ name: "elysia" })
   .use(authCookie)
   .use(
     cors({
@@ -200,6 +202,13 @@ const app = new Elysia()
           }
         }),
   )
+  .use(
+    trpc(router, {
+      createContext,
+      endpoint: "/trpc",
+    }),
+  )
+  // .use(trpcPlugin)
 
   .listen(3000);
 console.log(
